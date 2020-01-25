@@ -31,10 +31,19 @@ Start locally: php -S localhost:8080 -t public/
 ## Specific Information
 
 - Models generated from https://app.formassembly.com/api_v1/responses/export/{form_id}.json response object
-- DomPDF utilized for the PDF generation
+- DomPDF utilized for the PDF generation with each response on a separate page
 - Must acquire a "code" from FormAssembly using the following:
 https://app.formassembly.com/oauth/authorize?type=web&client_id={CLIENT ID}&redirect_uri=http://localhost:8080&response_type=code
 - To generate PDF of all responses for a form, must include the "code" parameter to: http://localhost:8080/api/v1/responses/export/pdf/{form id}
+- Mail currently setup using Mailtrap.io in .env file (to prevent real outgoing emails)
+- Emails that are sent will have a link to the localized report stored in storage/app/forms/{form id} folder
+- utilized 2 FormAssembly API endpoints (get form responses and get user)
+- need to add unit tests...
+
+## Improvements
+
+- Use external remote storage of PDF files rather than local storage
+
 
 ## Official Documentation
 

@@ -68,6 +68,13 @@ $app->singleton(
 $app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
 $app->instance('path.storage', app()->basePath() . DIRECTORY_SEPARATOR . 'storage');
 
+// new storage path
+// base_path() -> returns root path
+$path_storage = base_path() . "/storage";
+
+// override already $app->storagePath using the function
+$app->useStoragePath($path_storage);
+
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers

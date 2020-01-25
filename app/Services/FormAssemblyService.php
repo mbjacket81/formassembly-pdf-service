@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 class FormAssemblyService implements FormAssemblyServiceInterface  {
 	const OAUTH_URL = 'https://app.formassembly.com/oauth/access_token';
 	const FORM_RESPONSES_EXPORT_URL = 'https://app.formassembly.com/api_v1/responses/export/';
+	const USER_URL = 'https://app.formassembly.com/api_v1/users/profile.json';
 
 	private function authenticate(string $code): string {
 		$client = new \GuzzleHttp\Client();
@@ -46,5 +47,17 @@ class FormAssemblyService implements FormAssemblyServiceInterface  {
 			}
 		}
 		return $formResponseArray;
+	}
+
+	public function getUser( string $code ) {
+		$client = new \GuzzleHttp\Client();
+		$formResponses = $client->request('GET',
+			self::USER_URL, [
+				\GuzzleHttp\RequestOptions::HEADERS => [
+					'Authorization' => 'Bearer '.$this->authenticate($code)
+				]
+			]);
+		$jsonResponse = json_decode($formResponses->getBody());
+		return $jsonResponse;
 	}
 }

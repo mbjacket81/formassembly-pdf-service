@@ -20,5 +20,8 @@ class AppServiceProvider extends ServiceProvider
 			    $app['Illuminate\Routing\Redirector']
 		    );
 	    });
+	    $this->app->singleton('mailer', function ($app) {
+		    return $app->loadComponent('mail', 'Illuminate\Mail\MailServiceProvider', 'mailer');
+	    });
     }
 }

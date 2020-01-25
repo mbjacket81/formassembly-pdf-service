@@ -17,6 +17,7 @@ $router->get('/', function () use ($router) {
 
 $router->group(['prefix' => 'api'], function() use($router){
 	$router->group(['prefix' => 'v1'], function() use($router){
-		$router->get('responses/export/pdf/{formId}', 'v1\PdfController@getFormPdfResults');
+		$router->get('responses/export/pdf/{formId}', 'v1\PdfController@generateFormPdfResults');
+		$router->get('responses/{formId}/pdf', 'v1\PdfController@getFormPdfResults');
 	});
 });
