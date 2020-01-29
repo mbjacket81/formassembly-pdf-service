@@ -38,7 +38,7 @@ https://app.formassembly.com/oauth/authorize?type=web&client_id={CLIENT ID}&redi
 - Mail currently setup using Mailtrap.io in .env file (to prevent real outgoing emails)
 - Emails that are sent will have a link to the localized report stored in storage/app/forms/{form id} folder
 - utilized 2 FormAssembly API endpoints (get form responses and get user)
-- need to add unit tests...
+- Unit tests utilizing mocked FormAssembly API responses to verify model mapping functionality and exception cases
 
 ## Improvements
 

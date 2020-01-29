@@ -2,62 +2,67 @@
 
 namespace App\Services;
 
+use App\Http\Middleware\FormAssemblyMiddleware;
+use App\Models\CustomException;
 use App\Models\FormResponse;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\CurlHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\ResponseInterface;
 
 class FormAssemblyService implements FormAssemblyServiceInterface  {
-	const OAUTH_URL = 'https://app.formassembly.com/oauth/access_token';
+	public const OAUTH_URL = 'https://app.formassembly.com/oauth/access_token';
 	const FORM_RESPONSES_EXPORT_URL = 'https://app.formassembly.com/api_v1/responses/export/';
 	const USER_URL = 'https://app.formassembly.com/api_v1/users/profile.json';
 
-	private function authenticate(string $code): string {
-		$client = new \GuzzleHttp\Client();
-		$authResponse = $client->request('POST', self::OAUTH_URL, [
-			\GuzzleHttp\RequestOptions::FORM_PARAMS => [
-				'code' => $code,
-				'grant_type' => 'authorization_code',
-				'type' => 'web_server',
-				'client_id' => env('FA_OAUTH_CLIENT_ID'),
-				'client_secret' => env('FA_OAUTH_CLIENT_SECRET'),
-				'redirect_uri' => env('APP_URL')
-			]
-		]);
-		$jsonResponse = json_decode($authResponse->getBody());
-		if(!empty($jsonResponse) && !empty($authCode = $jsonResponse->{'access_token'})){
-			return $authCode;
-		}else{
-			return null;
-		}
-	}
 
-	public function getFormResponses(string $code, int $formId) {
-		$client = new \GuzzleHttp\Client();
-		$formResponses = $client->request('GET',
-			self::FORM_RESPONSES_EXPORT_URL.$formId.'.json', [
-			\GuzzleHttp\RequestOptions::HEADERS => [
-				'Authorization' => 'Bearer '.$this->authenticate($code)
-			]
-		]);
-		$jsonResponse = json_decode($formResponses->getBody());
-		$formResponseArray = [];
-		if(is_array($jsonResponse->responses->response)){
-			foreach ($jsonResponse->responses->response as $resp){
-				array_push($formResponseArray, new FormResponse($resp));
+
+	public function getFormResponses(FormAssemblyClientServiceInterface $client, string $code, int $formId) {
+		try {
+			$formResponses =
+				$client->getClient($code)->request( 'GET',
+				self::FORM_RESPONSES_EXPORT_URL . $formId . '.json');
+			$jsonResponse      = json_decode( $formResponses->getBody() );
+			$formResponseArray = [];
+			if ( is_array( $jsonResponse->responses->response ) ) {
+				foreach ( $jsonResponse->responses->response as $resp ) {
+					array_push( $formResponseArray, new FormResponse( $resp ) );
+				}
+			}
+			return $formResponseArray;
+		}catch(RequestException $e){
+			Log::error($e);
+			if($e->getCode() == 422){
+				throw new CustomException("Authentication error with FormAssembly", $e);
+			}else{
+				if($e instanceof ConnectException){
+					throw new CustomException("There has been a networking error with FormAssembly", $e);
+				}else{
+					throw new CustomException("There has been an error communicating with FormAssembly", $e);
+				}
 			}
 		}
-		return $formResponseArray;
 	}
 
-	public function getUser( string $code ) {
-		$client = new \GuzzleHttp\Client();
-		$formResponses = $client->request('GET',
-			self::USER_URL, [
-				\GuzzleHttp\RequestOptions::HEADERS => [
-					'Authorization' => 'Bearer '.$this->authenticate($code)
-				]
-			]);
-		$jsonResponse = json_decode($formResponses->getBody());
-		return $jsonResponse;
+	public function getUser(FormAssemblyClientServiceInterface $client, string $code ) {
+		try {
+			$formResponses = $client->getClient($code)->request('GET', self::USER_URL);
+			return json_decode($formResponses->getBody());
+		} catch (RequestException $e) {
+			Log::error($e);
+			if($e->getCode() == 422){
+				throw new CustomException("Authentication error with FormAssembly", $e);
+			}else{
+				if($e instanceof ConnectException){
+					throw new CustomException("There has been a networking error with FormAssembly", $e);
+				}else{
+					throw new CustomException("There has been an error communicating with FormAssembly", $e);
+				}
+			}
+		}
 	}
 }

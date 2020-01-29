@@ -16,6 +16,9 @@ class FormAssemblyProvider extends ServiceProvider {
 		$this->app->bind(\App\Services\FormAssemblyServiceInterface::class, function() {
 			return new \App\Services\FormAssemblyService();
 		});
+		$this->app->bind(\App\Services\FormAssemblyClientServiceInterface::class, function() {
+			return new \App\Services\FormAssemblyClientService();
+		});
 	}
 
 }

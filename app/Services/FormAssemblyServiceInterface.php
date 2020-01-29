@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use GuzzleHttp\Client;
+
 interface FormAssemblyServiceInterface {
-	public function getFormResponses(string $code, int $formId);
-	public function getUser(string $code);
+	public function getFormResponses(FormAssemblyClientServiceInterface $client, string $code, int $formId);
+	public function getUser(FormAssemblyClientServiceInterface $client, string $code);
 }
