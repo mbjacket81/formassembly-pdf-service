@@ -35,7 +35,8 @@ class FormAssemblyMiddleware {
 						if(!empty( $authCode = $jsonResponse->{'access_token'} ) ) {
 							$request = $request->withHeader( 'Authorization', 'Bearer ' . $authCode );
 						}
-					}else{
+					}
+					if(!isset($authCode) || empty($authCode)){
 						throw new CustomException("Access token could not be attained with the given code parameter.");
 					}
 				}catch(RequestException $e){
