@@ -8,7 +8,6 @@ use App\Models\CustomException;
 use App\Services\FormAssemblyService;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
-use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\RequestInterface;
 
 class FormAssemblyMiddleware {
@@ -32,11 +31,21 @@ class FormAssemblyMiddleware {
 						]
 					] );
 					$jsonResponse = json_decode( $authResponse->getBody() );
-					if ( ! empty( $jsonResponse ) && ! empty( $authCode = $jsonResponse->{'access_token'} ) ) {
-						$request = $request->withHeader('Authorization', 'Bearer ' . $authCode);
+					if ( !empty( $jsonResponse )){
+						if(!empty( $authCode = $jsonResponse->{'access_token'} ) ) {
+							$request = $request->withHeader( 'Authorization', 'Bearer ' . $authCode );
+						}
+					}else{
+						throw new CustomException("Access token could not be attained with the given code parameter.");
 					}
 				}catch(RequestException $e){
-					Log::error($e);
+					if($e->getCode() == 400){
+						$jsonResponse = json_decode( $e->getResponse()->getBody() );
+						if ( !empty( $jsonResponse ) && strcmp($jsonResponse->error, "invalid_client") == 0){
+							throw new CustomException("The code given is invalid and we cannot login.");
+						}
+						throw new CustomException("A Bad Request was made with FormAssembly, check the code parameter given.");
+					}
 					throw new CustomException("There has been an error communicating with FormAssembly", $e);
 				}
 				return $handler($request, $options);

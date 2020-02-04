@@ -11,7 +11,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
-use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\ResponseInterface;
 
 class FormAssemblyService implements FormAssemblyServiceInterface  {
@@ -35,7 +34,6 @@ class FormAssemblyService implements FormAssemblyServiceInterface  {
 			}
 			return $formResponseArray;
 		}catch(RequestException $e){
-			Log::error($e);
 			if($e->getCode() == 422){
 				throw new CustomException("Authentication error with FormAssembly", $e);
 			}else{
@@ -53,7 +51,6 @@ class FormAssemblyService implements FormAssemblyServiceInterface  {
 			$formResponses = $client->getClient($code)->request('GET', self::USER_URL);
 			return json_decode($formResponses->getBody());
 		} catch (RequestException $e) {
-			Log::error($e);
 			if($e->getCode() == 422){
 				throw new CustomException("Authentication error with FormAssembly", $e);
 			}else{

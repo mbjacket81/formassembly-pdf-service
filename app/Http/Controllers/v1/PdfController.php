@@ -29,7 +29,7 @@ class PdfController extends Controller {
 
 	public function generateFormPdfResults($formId, Request $request, FormAssemblyClientServiceInterface $client, FormAssemblyServiceInterface $form_assembly_service){
 		$this->dispatch(new BuildPdfJob($request->header('code'), $formId, $client, $form_assembly_service));
-		return response()->json(['message' => "Started PDF generation of Form Responses"]);
+		return response()->json(['message' => "Started PDF generation of Form Responses.  If an invalid code is passed, the responses PDF will not be generated."]);
 	}
 
 

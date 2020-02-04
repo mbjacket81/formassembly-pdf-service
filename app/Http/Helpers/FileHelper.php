@@ -27,24 +27,17 @@ class FileHelper {
 	}
 
 	public static function storePdf($formId, $responses, $forceGenerate = false){
-		if(!$forceGenerate) {
-			$files = Storage::disk( 'local' )->files( "forms/{$formId}" );
-			if(count($files) < 1) { //no files, store pdf
-				return FileHelper::generatePdf($formId, $responses);
-			}else{
-				return true;
-			}
-		}else{
-			$files = Storage::disk( 'local' )->files( "forms/{$formId}" );
-			if(count($files) < 1) { //no files, store pdf
-				return FileHelper::generatePdf($formId, $responses);
-			}else{
-				$lastFile = $files[0];
-				$lastFilePathArray = explode(".",$lastFile);
-				$version = $lastFilePathArray[count($lastFilePathArray)-2];
-				return FileHelper::generatePdf($formId, $responses, $version);
-			}
+		$files = Storage::disk( 'local' )->files( "forms/{$formId}" );
+		if(count($files) < 1) { //no files, store pdf
+			return FileHelper::generatePdf($formId, $responses);
 		}
+		if($forceGenerate) {
+			$lastFile = $files[0];
+			$lastFilePathArray = explode(".",$lastFile);
+			$version = $lastFilePathArray[count($lastFilePathArray)-2];
+			return FileHelper::generatePdf($formId, $responses, $version);
+		}
+		return true; //already stored the PDF
 	}
 
 	private static function generatePdf($formId, $responses, $version = 1){
@@ -74,23 +67,7 @@ class FileHelper {
 		$numResponses = count($responses);
 		$i = 0;
 		foreach ($responses as $response) {
-			$html .= "<small>RESPONSE #".$response->metaFields['response_id'].
-			         (isset($response->metaFields['date_submitted']) ? (" - SUBMITTED ON ".$response->metaFields['date_submitted']) : "")."</small><br/>";
-			$html .= "<h1>{$response->formTitle}</h1>";
-			foreach ( $response->fieldSets as $field_set ) {
-				$html .= "<h3>{$field_set->label}</h3><hr>";
-				$html .= "<table>";
-				foreach ( $field_set->fields as $field ) {
-					$html .= "<tr><th>{$field->label}</th>";
-					if(empty($field->value)){
-						$html .= "<td style='color:red'><i>No answer given.</i></td>";
-					}else{
-						$html .= "<td>{$field->value}</td>";
-					}
-					$html .= "</tr>";
-				}
-				$html .= "</table>";
-			}
+			$html .= self::generateIndividualResponseHtmlReport($response);
 			if(++$i != $numResponses) {
 				$html .= "<div class='page_break'></div>";
 			}
