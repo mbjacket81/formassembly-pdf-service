@@ -20,7 +20,7 @@ class PdfControllerTest extends TestCase {
 	 *
 	 * @return void
 	 */
-	public function testBuildingPdf() {
+	public function testMicroserviceCall() {
 		$this->get( '/' );
 
 		$this->assertEquals(

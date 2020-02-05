@@ -7,5 +7,5 @@ namespace App\Services;
 use GuzzleHttp\Client;
 
 interface FormAssemblyClientServiceInterface {
-	public function getClient($code): Client;
+	public function getClient(string $code): Client;
 }

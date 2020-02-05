@@ -3,6 +3,9 @@
 
 namespace App\Models;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Support\Facades\Storage;
 
 class FormResponse {
 	public $formTitle;
@@ -77,5 +80,40 @@ class FormResponse {
 				}
 			}
 		}
+	}
+
+	public function generateHTMLReport(): string{
+		$html = "<small>RESPONSE ".
+		        (isset($this->metaFields['response_id']) ? "#".$this->metaFields['response_id'] : "") .
+		        (isset($response->metaFields['date_submitted']) ? (" - SUBMITTED ON ".$this->metaFields['date_submitted']) : "").
+		        "</small><br/>";
+		if(!empty($this->formTitle)) {
+			$html .= "<h1>{$this->formTitle}</h1>";
+		}
+		if(!empty($this->fieldSets)) {
+			foreach ( $this->fieldSets as $field_set ) {
+				$html .= "<h3>{$field_set->label}</h3><hr>";
+				$html .= "<table>";
+				foreach ( $field_set->fields as $field ) {
+					$html .= "<tr><th>{$field->label}</th>";
+					if ( empty( $field->value ) ) {
+						$html .= "<td style='color:red'><i>No answer given.</i></td>";
+					} else {
+						$html .= "<td>{$field->value}</td>";
+					}
+					$html .= "</tr>";
+				}
+				$html .= "</table>";
+			}
+		}
+		return $html;
+	}
+
+	public function generateResponsePdf(): string {
+		$pdfOptions = new Options();
+		$dompdf     = new Dompdf( $pdfOptions );
+		$dompdf->loadHtml( $this->generateHTMLReport() );
+		$dompdf->render();
+		return $dompdf->output();
 	}
 }

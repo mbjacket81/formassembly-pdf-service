@@ -22,6 +22,7 @@ $app = new Laravel\Lumen\Application(
 );
 
 $app->withFacades();
+//$app->configure('swagger-lume');
 
 // $app->withEloquent();
 
@@ -57,10 +58,6 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
-
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
@@ -88,9 +85,8 @@ $app->useStoragePath($path_storage);
 
 $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
-//$app->register(Vyuldashev\LaravelOpenApi\OpenApiServiceProvider::class);
 $app->register(\App\Providers\FormAssemblyProvider::class);
+//$app->register(\SwaggerLume\ServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

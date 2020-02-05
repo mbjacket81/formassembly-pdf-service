@@ -11,7 +11,7 @@ use GuzzleHttp\HandlerStack;
 
 class FormAssemblyClientService implements FormAssemblyClientServiceInterface {
 
-	public function getClient($code): Client {
+	public function getClient(string $code): Client {
 		$stack = new HandlerStack();
 		$stack->setHandler(new CurlHandler());
 		$stack->push( FormAssemblyMiddleware::add_auth($code));

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Http\Helpers\FileHelper;
+use App\Http\Helpers\FileUtility;
 use App\Models\CustomException;
 use App\Services\FormAssemblyClientServiceInterface;
 use App\Services\FormAssemblyServiceInterface;
@@ -35,7 +35,7 @@ class BuildPdfJob extends Job {
 	public function handle() {
 		try {
 			$responses       = $this->formAssemblyService->getFormResponses($this->formAssemblyClientService, $this->formAssemblyCode, $this->formId );
-			$storeSucceeded  = FileHelper::storePdf( $this->formId, $responses );
+			$storeSucceeded  = FileUtility::storePdf( $this->formId, false, $responses );
 			$userResponse    = $this->formAssemblyService->getUser($this->formAssemblyClientService, $this->formAssemblyCode );
 			$this->userEmail = $userResponse->email;
 			dispatch( new SendPdfNotificationEmail( $this->formId, $this->userEmail, $storeSucceeded ) );

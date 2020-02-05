@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Models;
+namespace App\Exceptions;
 
 use Illuminate\Support\Facades\Log;
 

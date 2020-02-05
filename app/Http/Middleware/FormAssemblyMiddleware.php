@@ -3,16 +3,16 @@
 
 namespace App\Http\Middleware;
 
-
-use App\Models\CustomException;
+use App\Exceptions\ConnectionException;
 use App\Services\FormAssemblyService;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
+use Illuminate\Auth\AuthenticationException;
 use Psr\Http\Message\RequestInterface;
 
 class FormAssemblyMiddleware {
 
-	public static function add_auth($code){
+	public static function add_auth(string $code){
 		return function (callable $handler) use ($code) {
 			return function (
 				RequestInterface $request,
@@ -37,17 +37,17 @@ class FormAssemblyMiddleware {
 						}
 					}
 					if(!isset($authCode) || empty($authCode)){
-						throw new CustomException("Access token could not be attained with the given code parameter.");
+						throw new AuthenticationException("Access token could not be attained with the given code parameter.");
 					}
 				}catch(RequestException $e){
 					if($e->getCode() == 400){
 						$jsonResponse = json_decode( $e->getResponse()->getBody() );
 						if ( !empty( $jsonResponse ) && strcmp($jsonResponse->error, "invalid_client") == 0){
-							throw new CustomException("The code given is invalid and we cannot login.");
+							throw new AuthenticationException("The code given is invalid and we cannot login.");
 						}
-						throw new CustomException("A Bad Request was made with FormAssembly, check the code parameter given.");
+						throw new ConnectionException("A Bad Request was made with FormAssembly, check the code parameter given.");
 					}
-					throw new CustomException("There has been an error communicating with FormAssembly", $e);
+					throw new ConnectionException("There has been an error communicating with FormAssembly", $e);
 				}
 				return $handler($request, $options);
 			};
