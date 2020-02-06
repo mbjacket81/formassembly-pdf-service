@@ -1,0 +1,86 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "FormAssembly PDF Results API",
+        "contact": {
+            "name": "Form Assembly Support Team",
+            "email": "support@formassembly.com"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/v1/responses/{formId}/pdf": {
+            "get": {
+                "tags": [
+                    "PDFReport"
+                ],
+                "operationId": "responses/formId/pdf",
+                "parameters": [
+                    {
+                        "name": "formId",
+                        "in": "path",
+                        "description": "The form ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the PDF report.",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad request. When required parameters were not supplied."
+                    }
+                }
+            }
+        },
+        "/api/v1/responses/export/pdf/{formId}": {
+            "get": {
+                "tags": [
+                    "PDFGeneration"
+                ],
+                "operationId": "/responses/export/pdf/formId",
+                "parameters": [
+                    {
+                        "name": "formId",
+                        "in": "path",
+                        "description": "The form ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "code",
+                        "in": "header",
+                        "description": "API authentication code",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns a standard message after firing off the PDF generation process.",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad request. When required parameters were not supplied."
+                    }
+                }
+            }
+        }
+    }
+}
