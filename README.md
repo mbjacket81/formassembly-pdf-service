@@ -31,6 +31,7 @@ Start locally: php -S localhost:8080 -t public/
 
 ## Specific Information
 
+- Swagger API Documentation: http://localhost:8080/api/documentation
 - Models generated from https://app.formassembly.com/api_v1/responses/export/{form_id}.json response object
 - DomPDF utilized for the PDF generation with each response on a separate page
 - Must acquire a "code" from FormAssembly using the following:

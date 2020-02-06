@@ -22,7 +22,7 @@ $app = new Laravel\Lumen\Application(
 );
 
 $app->withFacades();
-//$app->configure('swagger-lume');
+$app->configure('swagger-lume');
 
 // $app->withEloquent();
 
@@ -86,7 +86,7 @@ $app->useStoragePath($path_storage);
 $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(\App\Providers\FormAssemblyProvider::class);
-//$app->register(\SwaggerLume\ServiceProvider::class);
+$app->register(\SwaggerLume\ServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
