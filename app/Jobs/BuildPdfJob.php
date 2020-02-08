@@ -39,7 +39,7 @@ class BuildPdfJob extends Job {
 			$userResponse    = $this->formAssemblyService->getUser($this->formAssemblyClientService, $this->formAssemblyCode );
 			$this->userEmail = $userResponse->email;
 			dispatch( new SendPdfNotificationEmail( $this->formId, $this->userEmail, $storeSucceeded ) );
-		}catch(CustomException $ex){
+		}catch(\Exception $ex){
 			if(isset($this->userEmail)){
 				dispatch( new SendPdfNotificationEmail( $this->formId, $this->userEmail, false ) );
 			}

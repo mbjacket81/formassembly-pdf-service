@@ -46,6 +46,9 @@ https://app.formassembly.com/oauth/authorize?type=web&client_id={CLIENT ID}&redi
 
 - Use external remote storage of PDF files rather than local storage
 
+## Additionally
+
+- In order to generate an immediate response to retrieve the PDF report of results (without emailing the form owner), use the following service: http://localhost:8080/api/v1/responses/export/pdf/immediate/{form id}
 
 ## Official Documentation
 

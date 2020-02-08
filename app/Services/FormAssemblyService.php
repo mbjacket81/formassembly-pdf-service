@@ -16,16 +16,16 @@ use GuzzleHttp\RequestOptions;
 use Illuminate\Auth\AuthenticationException;
 use Psr\Http\Message\ResponseInterface;
 
-class FormAssemblyService implements FormAssemblyServiceInterface  {
+class FormAssemblyService implements FormAssemblyServiceInterface {
 	public const OAUTH_URL = 'https://app.formassembly.com/oauth/access_token';
 	const FORM_RESPONSES_EXPORT_URL = 'https://app.formassembly.com/api_v1/responses/export/';
 	const USER_URL = 'https://app.formassembly.com/api_v1/users/profile.json';
 
-	public function getFormResponses(FormAssemblyClientServiceInterface $client, string $code, int $formId): FormResponseArray {
+	public function getFormResponses( FormAssemblyClientServiceInterface $client, string $code, int $formId ): FormResponseArray {
 		try {
-			$formResponses =
-				$client->getClient($code)->request( 'GET',
-				self::FORM_RESPONSES_EXPORT_URL . $formId . '.json');
+			$formResponses     =
+				$client->getClient( $code )->request( 'GET',
+					self::FORM_RESPONSES_EXPORT_URL . $formId . '.json' );
 			$jsonResponse      = json_decode( $formResponses->getBody() );
 			$formResponseArray = [];
 			if ( is_array( $jsonResponse->responses->response ) ) {
@@ -33,32 +33,34 @@ class FormAssemblyService implements FormAssemblyServiceInterface  {
 					array_push( $formResponseArray, new FormResponse( $resp ) );
 				}
 			}
-			return new FormResponseArray(...$formResponseArray);
-		}catch(RequestException $e){
-			if($e->getCode() == 422){
-				throw new AuthenticationException("Authentication error with FormAssembly");
-			}else{
-				if($e instanceof ConnectException){
-					throw new ConnectionException("There has been a networking error with FormAssembly", $e);
-				}else{
-					throw new CustomException("There has been an error communicating with FormAssembly", $e);
+
+			return new FormResponseArray( ...$formResponseArray );
+		} catch ( RequestException $e ) {
+			if ( $e->getCode() == 422 ) {
+				throw new AuthenticationException( "Authentication error with FormAssembly" );
+			} else {
+				if ( $e instanceof ConnectException ) {
+					throw new ConnectionException( "There has been a networking error with FormAssembly", $e );
+				} else {
+					throw new CustomException( "There has been an error communicating with FormAssembly", $e );
 				}
 			}
 		}
 	}
 
-	public function getUser(FormAssemblyClientServiceInterface $client, string $code ): object {
+	public function getUser( FormAssemblyClientServiceInterface $client, string $code ): object {
 		try {
-			$formResponses = $client->getClient($code)->request('GET', self::USER_URL);
-			return json_decode($formResponses->getBody());
-		} catch (RequestException $e) {
-			if($e->getCode() == 422){
-				throw new ConnectionException("Authentication error with FormAssembly", $e);
-			}else{
-				if($e instanceof ConnectException){
-					throw new CustomException("There has been a networking error with FormAssembly", $e);
-				}else{
-					throw new CustomException("There has been an error communicating with FormAssembly", $e);
+			$formResponses = $client->getClient( $code )->request( 'GET', self::USER_URL );
+
+			return json_decode( $formResponses->getBody() );
+		} catch ( RequestException $e ) {
+			if ( $e->getCode() == 422 ) {
+				throw new ConnectionException( "Authentication error with FormAssembly", $e );
+			} else {
+				if ( $e instanceof ConnectException ) {
+					throw new CustomException( "There has been a networking error with FormAssembly", $e );
+				} else {
+					throw new CustomException( "There has been an error communicating with FormAssembly", $e );
 				}
 			}
 		}

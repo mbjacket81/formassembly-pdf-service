@@ -3,6 +3,8 @@
 
 namespace App\Http\Controllers\v1;
 
+use App\Exceptions\ConnectionException;
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Helpers\FileUtility;
 use App\Jobs\BuildPdfJob;
@@ -11,6 +13,7 @@ use App\Services\FormAssemblyClientServiceInterface;
 use App\Services\FormAssemblyServiceInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -85,5 +88,22 @@ class PdfController extends Controller {
 		return response()->json(['message' => "Started PDF generation of Form Responses.  If an invalid code is passed, the responses PDF will not be generated."]);
 	}
 
+	public function generateResultsPdfImmediately(int $formId, Request $request, FormAssemblyClientServiceInterface $client, FormAssemblyServiceInterface $form_assembly_service){
+		try {
+			$responses       = $form_assembly_service->getFormResponses($client, $request->header('code'), $formId );
+			$storeSucceeded  = FileUtility::storePdf( $formId, false, $responses );
+			if ( $storeSucceeded ) {
+				return redirect()->route( 'directFile', [ 'formId' => $formId ] );
+			} else {
+				return response()->json( [ 'message' => "The Form Responses PDF generation was unsuccessful." ] );
+			}
+		}catch(ConnectionException $ce){
+			return response()->json(['error' => $ce->error]);
+		}catch(CustomException $ce){
+			return response()->json(['error' => $ce->error]);
+		}catch(AuthenticationException $ae){
+			return response()->json(['error' => $ae->getMessage()], $ae->getCode());
+		}
+	}
 
 }

@@ -11,13 +11,14 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+Route::get('/', function () {
+    return Route::app()->version();
 });
 
-$router->group(['prefix' => 'api'], function() use($router){
-	$router->group(['prefix' => 'v1'], function() use($router){
-		$router->get('responses/export/pdf/{formId}', 'v1\PdfController@generateFormPdfResults');
-		$router->get('responses/{formId}/pdf', 'v1\PdfController@getFormPdfResults');
+Route::group(['prefix' => 'api'], function() {
+	Route::group(['prefix' => 'v1'], function() {
+		Route::get('responses/export/pdf/immediate/{formId}', 'v1\PdfController@generateResultsPdfImmediately');
+		Route::get('responses/export/pdf/{formId}', 'v1\PdfController@generateFormPdfResults');
+		Route::get('responses/{formId}/pdf', ['as' => 'directFile', 'uses' => 'v1\PdfController@getFormPdfResults']);
 	});
 });
